@@ -15,7 +15,7 @@ func (s *Server) HandleSignup() gin.HandlerFunc {
 			response.JSON(c, "", http.StatusBadRequest, nil, err)
 			return
 		}
-		userResponse, err := s.AuthService.SignupUser(&user)
+		userResponse, err := s.UserService.SignupUser(&user)
 		if err != nil {
 			err.Respond(c)
 			return
@@ -31,7 +31,7 @@ func (s *Server) handleLogin() gin.HandlerFunc {
 			response.JSON(c, "", errors.ErrBadRequest.Status, nil, err)
 			return
 		}
-		userResponse, err := s.AuthService.LoginUser(&loginRequest)
+		userResponse, err := s.UserService.LoginUser(&loginRequest)
 		if err != nil {
 			response.JSON(c, "", err.Status, nil, err)
 			return
