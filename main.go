@@ -6,6 +6,7 @@ import (
 	"sendchamp-go-test/config"
 	"sendchamp-go-test/db"
 	"sendchamp-go-test/server"
+	"sendchamp-go-test/services"
 	"time"
 )
 
@@ -17,13 +18,13 @@ func main() {
 	}
 
 	gormDB := db.GetDB(conf)
-	authRepo := db.NewAuthRepo(gormDB)
-	authService := services.NewAuthService(authRepo, conf)
+	userRepo := db.NewUserRepo(gormDB)
+	userService := services.NewUserService(userRepo, conf)
 
 	s := &server.Server{
 		Config:         conf,
-		AuthRepository: authRepo,
-		AuthService:    authService,
+		UserRepository: userRepo,
+		UserService:    userService,
 	}
 	s.Start()
 }
