@@ -7,17 +7,17 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sendchamp-go-test/config"
+	"sendchamp-go-test/db"
+	"sendchamp-go-test/services"
 	"syscall"
 	"time"
-	"user-service/config"
-	"user-service/db"
-	"user-service/services"
 )
 
 // Server serves requests to DB with router
 type Server struct {
 	Config         *config.Config
-	AuthRepository db.AuthRepository
+	AuthRepository db.UserRepository
 	AuthService    services.AuthService
 }
 
