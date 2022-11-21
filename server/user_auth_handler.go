@@ -3,9 +3,9 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"user-service/errors"
-	"user-service/models"
-	"user-service/server/response"
+	"sendchamp-go-test/errors"
+	"sendchamp-go-test/models"
+	"sendchamp-go-test/server/response"
 )
 
 func (s *Server) HandleSignup() gin.HandlerFunc {
