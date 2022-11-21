@@ -26,7 +26,7 @@ func (s *Server) Start() {
 	// TODO: user config.PORT here
 	PORT := fmt.Sprintf(":%s", os.Getenv("PORT"))
 	if PORT == ":" {
-		PORT = ":8080"
+		PORT = ":8081"
 	}
 	srv := &http.Server{
 		Addr:    PORT,

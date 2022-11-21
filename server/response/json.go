@@ -3,8 +3,8 @@ package response
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sendchamp-go-test/errors"
 	"strings"
-	"user-service/errors"
 )
 
 func JSON(c *gin.Context, message string, status int, data interface{}, err error) {
