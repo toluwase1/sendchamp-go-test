@@ -19,6 +19,7 @@ type Server struct {
 	Config         *config.Config
 	UserRepository db.UserRepository
 	UserService    services.UserService
+	TaskService    services.TaskService
 }
 
 func (s *Server) Start() {
