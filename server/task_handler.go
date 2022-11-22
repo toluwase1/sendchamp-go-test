@@ -11,6 +11,11 @@ import (
 
 func (s *Server) HandleCreateTask() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		_, user, err := GetValuesFromContext(c)
+		if err != nil {
+			err.Respond(c)
+			return
+		}
 		var task models.Task
 		if err := decode(c, &task); err != nil {
 			response.JSON(c, "", http.StatusBadRequest, nil, err)
@@ -27,11 +32,11 @@ func (s *Server) HandleCreateTask() gin.HandlerFunc {
 
 func (s *Server) HandleUpdateTask() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//_, user, err := GetValuesFromContext(c)
-		//if err != nil {
-		//	err.Respond(c)
-		//	return
-		//}
+		_, user, err := GetValuesFromContext(c)
+		if err != nil {
+			err.Respond(c)
+			return
+		}
 		//id, errr := strconv.ParseUint(c.Param("companyID"), 10, 32)
 		id := c.Param("taskID")
 		var updateTaskRequest models.Task
