@@ -24,15 +24,15 @@ type TaskService interface {
 type taskService struct {
 	Config   *config.Config
 	taskRepo db.TaskRepository
-	kafka    db.RabbitMqRepository
+	rabbitmq db.RabbitMqRepository
 }
 
 // NewCompanyService instantiate an taskService
-func NewTaskService(taskRepo db.TaskRepository, kafkaRepo db.RabbitRepository, conf *config.Config) CompanyService {
+func NewTaskService(taskRepo db.TaskRepository, rabbitmq db.RabbitMqRepository, conf *config.Config) TaskService {
 	return &taskService{
 		Config:   conf,
 		taskRepo: taskRepo,
-		kafka:    kafkaRepo,
+		rabbitmq: rabbitmq,
 	}
 }
 
@@ -44,7 +44,7 @@ func (a *taskService) CreateTask(task *models.Task) (*models.Task, *apiError.Err
 		return nil, apiError.New("invalid task type", http.StatusBadRequest)
 	}
 	go func() {
-		err := Rabbitmq(msg)
+		err := a.rabbitmq.Rabbitmq(task)
 		if err != nil {
 			log.Println("Error publishing to rabbitmq", err)
 		}
@@ -55,7 +55,6 @@ func (a *taskService) CreateTask(task *models.Task) (*models.Task, *apiError.Err
 		log.Printf("task to create task: %v", err.Error())
 		return nil, apiError.New("internal server error", http.StatusInternalServerError)
 	}
-	_, _ = a.kafka.AddMessageToRabbitMq(task, context.Background())
 
 	return task, nil
 }
@@ -72,11 +71,11 @@ func (m *taskService) UpdateTask(request *models.Task, taskID string) *errors.Er
 		Priority:    request.Priority,
 	}
 	//get task where user and task id is defined above then send it for updating
+	_ = m.rabbitmq.Rabbitmq(&task)
 	err := m.taskRepo.UpdateTask(&task, taskID)
 	if err != nil {
 		return errors.ErrInternalServerError
 	}
-	_, _ = m.kafka.AddMessageToRabbitMq(&task, context.Background())
 	return nil
 }
 
@@ -88,7 +87,7 @@ func (a *taskService) DeleteTaskById(taskId string) *apiError.Error {
 	task := models.Task{
 		Id: taskId,
 	}
-	_, _ = a.kafka.AddMessageToRabbitMq(&task, context.Background())
+	_ = a.rabbitmq.Rabbitmq(&task)
 	return nil
 }
 

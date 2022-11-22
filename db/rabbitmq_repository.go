@@ -10,7 +10,7 @@ import (
 )
 
 type RabbitMqRepository interface {
-	Rabbitmq(msg models.Task) error
+	Rabbitmq(msg *models.Task) error
 }
 
 type rabbitRepo struct {
@@ -20,7 +20,7 @@ type rabbitRepo struct {
 func NewRabbitRepo(db *GormDB) RabbitMqRepository {
 	return &rabbitRepo{db.DB}
 }
-func (k *rabbitRepo) Rabbitmq(msg models.Task) error {
+func (k *rabbitRepo) Rabbitmq(msg *models.Task) error {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		log.Fatal(err)
@@ -29,7 +29,7 @@ func (k *rabbitRepo) Rabbitmq(msg models.Task) error {
 	defer conn.Close()
 	fmt.Println("Connected to RabbitMQ")
 	ch, err := conn.Channel()
-	log.Println("here 7")
+
 	if err != nil {
 		log.Println("Failed to open a channel")
 		panic(err)
