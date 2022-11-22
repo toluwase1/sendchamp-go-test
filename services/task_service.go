@@ -11,13 +11,13 @@ import (
 	"sendchamp-go-test/models"
 )
 
-//go:generate mockgen -destination=../mocks/auth_mock.go -package=mocks github.com/decagonhq/meddle-api/services AuthService
-// CompanyService interface
-type CompanyService interface {
+//go:generate mockgen -destination=../mocks/auth_mock.go -package=mocks sendchamp-go-test/services TaskService
+// TaskService interface
+type TaskService interface {
 	CreateTask(request *models.Task) (*models.Task, *apiError.Error)
-	UpdateTask(request *models.Task, companyID string) *errors.Error
+	UpdateTask(request *models.Task, taskID string) *errors.Error
 	DeleteTaskById(email string) *apiError.Error
-	GetAllTasks(companyId string) (*models.Task, error)
+	GetAllTasks(taskId string) (*models.Task, error)
 }
 
 // taskService struct
@@ -43,6 +43,13 @@ func (a *taskService) CreateTask(task *models.Task) (*models.Task, *apiError.Err
 	if !validTypes[task.Priority] {
 		return nil, apiError.New("invalid task type", http.StatusBadRequest)
 	}
+	go func() {
+		err := Rabbitmq(msg)
+		if err != nil {
+			log.Println("Error publishing to rabbitmq", err)
+		}
+	}()
+
 	task, err := a.taskRepo.CreateTask(task)
 	if err != nil {
 		log.Printf("task to create task: %v", err.Error())
@@ -65,7 +72,7 @@ func (m *taskService) UpdateTask(request *models.Task, taskID string) *errors.Er
 		Priority:    request.Priority,
 	}
 	//get task where user and task id is defined above then send it for updating
-	err := m.companyRepo.UpdateCompany(&task, taskID)
+	err := m.taskRepo.UpdateTask(&task, taskID)
 	if err != nil {
 		return errors.ErrInternalServerError
 	}
@@ -73,22 +80,22 @@ func (m *taskService) UpdateTask(request *models.Task, taskID string) *errors.Er
 	return nil
 }
 
-func (a *taskService) DeleteTaskById(companyId string) *apiError.Error {
-	err := a.companyRepo.DeleteCompanyById(companyId)
+func (a *taskService) DeleteTaskById(taskId string) *apiError.Error {
+	err := a.taskRepo.DeleteTaskById(taskId)
 	if err != nil {
 		return apiError.ErrInternalServerError
 	}
-	coy := models.Task{
-		Id: companyId,
+	task := models.Task{
+		Id: taskId,
 	}
-	_, _ = a.kafka.AddMessageToRabbitMq(&coy, context.Background())
+	_, _ = a.kafka.AddMessageToRabbitMq(&task, context.Background())
 	return nil
 }
 
-func (s *taskService) GetAllTasks(companyId string) (*models.Task, error) {
-	coy, err := s.companyRepo.FindCompanyById(companyId)
+func (s *taskService) GetAllTasks(taskId string) (*models.Task, error) {
+	task, err := s.taskRepo.FindTaskById(taskId)
 	if err != nil {
 		return &models.Task{}, apiError.ErrInternalServerError
 	}
-	return coy, nil
+	return task, nil
 }

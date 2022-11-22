@@ -14,6 +14,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/leebenson/conform v1.2.2
 	github.com/pkg/errors v0.9.1
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/crypto v0.3.0
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/gorm v1.24.2
