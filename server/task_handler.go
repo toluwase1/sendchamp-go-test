@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"sendchamp-go-test/errors"
 	_ "sendchamp-go-test/errors"
@@ -23,9 +24,10 @@ func (s *Server) HandleCreateTask() gin.HandlerFunc {
 			return
 		}
 		task.UserID = userId
-		userResponse, err := s.TaskService.CreateTask(&task)
-		if err != nil {
-			err.Respond(c)
+		userResponse, errr := s.TaskService.CreateTask(&task)
+		if errr != nil {
+			log.Println(errr)
+			errr.Respond(c)
 			return
 		}
 		response.JSON(c, "Task Creation successful", http.StatusCreated, userResponse, nil)
@@ -94,21 +96,24 @@ func (s *Server) handleDeleteTask() gin.HandlerFunc {
 func GetValuesFromContext(c *gin.Context) (string, *models.User, *errors.Error) {
 	var tokenI, userI interface{}
 	var tokenExists, userExists bool
-
+	log.Println("hello 1")
 	if tokenI, tokenExists = c.Get("access_token"); !tokenExists {
 		return "", nil, errors.New("forbidden", http.StatusForbidden)
 	}
+	log.Println("hello 2")
 	if userI, userExists = c.Get("user"); !userExists {
 		return "", nil, errors.New("forbidden", http.StatusForbidden)
 	}
-
+	log.Println("hello 3")
 	token, ok := tokenI.(string)
 	if !ok {
 		return "", nil, errors.New("internal server error", http.StatusInternalServerError)
 	}
+	log.Println("hello 4")
 	user, ok := userI.(*models.User)
 	if !ok {
 		return "", nil, errors.New("internal server error", http.StatusInternalServerError)
 	}
+	log.Println("hello 5")
 	return token, user, nil
 }

@@ -16,7 +16,7 @@ import (
 type TaskService interface {
 	CreateTask(request *models.Task) (*models.Task, *apiError.Error)
 	UpdateTask(request *models.Task, taskID string) *errors.Error
-	DeleteTaskById(email string) *apiError.Error
+	DeleteTaskById(id string) *apiError.Error
 	GetTaskById(taskId string) (*models.Task, error)
 }
 
@@ -43,11 +43,13 @@ func (a *taskService) CreateTask(task *models.Task) (*models.Task, *apiError.Err
 	if !validTypes[task.Priority] {
 		return nil, apiError.New("invalid task type", http.StatusBadRequest)
 	}
+	log.Println(" in it 1")
 	go func() {
 		err := a.rabbitmq.Rabbitmq(task)
 		if err != nil {
 			log.Println("Error publishing to rabbitmq", err)
 		}
+		log.Println("message successfully published in rabbitmq")
 	}()
 
 	task, err := a.taskRepo.CreateTask(task)
@@ -55,7 +57,6 @@ func (a *taskService) CreateTask(task *models.Task) (*models.Task, *apiError.Err
 		log.Printf("task to create task: %v", err.Error())
 		return nil, apiError.New("internal server error", http.StatusInternalServerError)
 	}
-
 	return task, nil
 }
 

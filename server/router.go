@@ -17,6 +17,10 @@ func (s *Server) defineRoutes(router *gin.Engine) {
 	authorized := apirouter.Group("/")
 	authorized.Use(s.Authorize())
 	authorized.POST("/logout", s.handleLogout())
+	authorized.POST("/task/create", s.HandleCreateTask())
+	authorized.GET("/task/get/:taskID", s.HandleGetTaskDetails())
+	authorized.DELETE("/task/delete/:taskID", s.handleDeleteTask())
+	authorized.PUT("/task/update/:taskID", s.HandleUpdateTask())
 }
 
 func (s *Server) setupRouter() *gin.Engine {

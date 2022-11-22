@@ -20,11 +20,15 @@ func main() {
 	gormDB := db.GetDB(conf)
 	userRepo := db.NewUserRepo(gormDB)
 	userService := services.NewUserService(userRepo, conf)
+	rabbitMqRepo := db.NewRabbitRepo(gormDB)
+	taskRepo := db.NewTaskRepo(gormDB)
+	taskService := services.NewTaskService(taskRepo, rabbitMqRepo, conf)
 
 	s := &server.Server{
 		Config:         conf,
 		UserRepository: userRepo,
 		UserService:    userService,
+		TaskService:    taskService,
 	}
 	s.Start()
 }

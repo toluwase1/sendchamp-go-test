@@ -58,7 +58,7 @@ func getMySqlDB(c *config.Config) *gorm.DB {
 }
 
 func migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&models.User{}, &models.BlackList{})
+	err := db.AutoMigrate(&models.User{}, &models.BlackList{}, &models.Task{})
 	if err != nil {
 		return fmt.Errorf("migrations error: %v", err)
 	}

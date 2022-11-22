@@ -50,7 +50,7 @@ func (s *Server) handleLogout() gin.HandlerFunc {
 			response.JSON(c, "", err.Status, nil, err)
 			return
 		}
-		claims, errr := jwt.ValidateAndGetClaims(token, s.Config.JWTSecret)
+		claims, errr := jwt.ValidateAndGetClaims(token, "aVeryLongSecret")
 		if errr != nil {
 			response.JSON(c, "", http.StatusUnauthorized, nil, errr)
 			return

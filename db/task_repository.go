@@ -23,7 +23,7 @@ type taskRepo struct {
 	DB *gorm.DB
 }
 
-func NewAuthRepo(db *GormDB) TaskRepository {
+func NewTaskRepo(db *GormDB) TaskRepository {
 	return &taskRepo{db.DB}
 }
 
@@ -57,7 +57,7 @@ func (m *taskRepo) UpdateTask(task *models.Task, taskId string) error {
 
 func (a *taskRepo) DeleteTaskById(taskId string) error {
 	task := &models.Task{}
-	err := a.DB.Where("task_id = ?", taskId).Find(task).Error
+	err := a.DB.Where("id = ?", taskId).Find(task).Error
 	if err != nil {
 		return fmt.Errorf("could not find task to delete: %v", err)
 	}

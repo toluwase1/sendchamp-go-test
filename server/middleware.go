@@ -18,7 +18,7 @@ import (
 // Authorize authorizes a request
 func (s *Server) Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		secret := s.Config.JWTSecret
+		secret := "aVeryLongSecret"
 		accessToken := getTokenFromHeader(c)
 		accessClaims, err := jwt.ValidateAndGetClaims(accessToken, secret)
 		if err != nil {
