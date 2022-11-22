@@ -76,3 +76,25 @@ func (s *Server) handleDeleteTask() gin.HandlerFunc {
 		response.JSON(c, "task successfully deleted", http.StatusOK, nil, nil)
 	}
 }
+
+func GetValuesFromContext(c *gin.Context) (string, *models.User, *errors.Error) {
+	var tokenI, userI interface{}
+	var tokenExists, userExists bool
+
+	if tokenI, tokenExists = c.Get("access_token"); !tokenExists {
+		return "", nil, errors.New("forbidden", http.StatusForbidden)
+	}
+	if userI, userExists = c.Get("user"); !userExists {
+		return "", nil, errors.New("forbidden", http.StatusForbidden)
+	}
+
+	token, ok := tokenI.(string)
+	if !ok {
+		return "", nil, errors.New("internal server error", http.StatusInternalServerError)
+	}
+	user, ok := userI.(*models.User)
+	if !ok {
+		return "", nil, errors.New("internal server error", http.StatusInternalServerError)
+	}
+	return token, user, nil
+}
