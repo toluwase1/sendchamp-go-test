@@ -16,11 +16,13 @@ func (s *Server) HandleCreateTask() gin.HandlerFunc {
 			err.Respond(c)
 			return
 		}
+		userId := user.ID
 		var task models.Task
 		if err := decode(c, &task); err != nil {
 			response.JSON(c, "", http.StatusBadRequest, nil, err)
 			return
 		}
+		task.UserID = userId
 		userResponse, err := s.TaskService.CreateTask(&task)
 		if err != nil {
 			err.Respond(c)
@@ -39,12 +41,14 @@ func (s *Server) HandleUpdateTask() gin.HandlerFunc {
 		}
 		//id, errr := strconv.ParseUint(c.Param("companyID"), 10, 32)
 		id := c.Param("taskID")
+		userId := user.ID
 		var updateTaskRequest models.Task
 		if err := decode(c, &updateTaskRequest); err != nil {
 			response.JSON(c, "", http.StatusBadRequest, nil, err)
 			return
 		}
-		err := s.TaskService.UpdateTask(&updateTaskRequest, id)
+		updateTaskRequest.UserID = userId
+		err = s.TaskService.UpdateTask(&updateTaskRequest, id)
 		if err != nil {
 			err.Respond(c)
 			return
@@ -55,9 +59,14 @@ func (s *Server) HandleUpdateTask() gin.HandlerFunc {
 
 func (s *Server) HandleGetTaskDetails() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id := c.Param("taskID")
-		task, err := s.TaskService.GetAllTasks(id)
+		_, _, err := GetValuesFromContext(c)
 		if err != nil {
+			err.Respond(c)
+			return
+		}
+		id := c.Param("taskID")
+		task, errr := s.TaskService.GetTaskById(id)
+		if errr != nil {
 			response.JSON(c, "", http.StatusInternalServerError, nil, errors.New("internal server error", http.StatusInternalServerError))
 			return
 		}
@@ -67,7 +76,7 @@ func (s *Server) HandleGetTaskDetails() gin.HandlerFunc {
 
 func (s *Server) handleDeleteTask() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		_, user, err := GetValuesFromContext(c)
+		_, _, err := GetValuesFromContext(c)
 		if err != nil {
 			err.Respond(c)
 			return

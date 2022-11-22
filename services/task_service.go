@@ -17,7 +17,7 @@ type TaskService interface {
 	CreateTask(request *models.Task) (*models.Task, *apiError.Error)
 	UpdateTask(request *models.Task, taskID string) *errors.Error
 	DeleteTaskById(email string) *apiError.Error
-	GetAllTasks(taskId string) (*models.Task, error)
+	GetTaskById(taskId string) (*models.Task, error)
 }
 
 // taskService struct
@@ -27,7 +27,7 @@ type taskService struct {
 	rabbitmq db.RabbitMqRepository
 }
 
-// NewCompanyService instantiate an taskService
+// NewTaskService instantiate an taskService
 func NewTaskService(taskRepo db.TaskRepository, rabbitmq db.RabbitMqRepository, conf *config.Config) TaskService {
 	return &taskService{
 		Config:   conf,
@@ -91,7 +91,7 @@ func (a *taskService) DeleteTaskById(taskId string) *apiError.Error {
 	return nil
 }
 
-func (s *taskService) GetAllTasks(taskId string) (*models.Task, error) {
+func (s *taskService) GetTaskById(taskId string) (*models.Task, error) {
 	task, err := s.taskRepo.FindTaskById(taskId)
 	if err != nil {
 		return &models.Task{}, apiError.ErrInternalServerError
