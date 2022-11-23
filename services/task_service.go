@@ -16,8 +16,8 @@ import (
 
 var (
 	WsUpgrader = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
+		ReadBufferSize:  10240,
+		WriteBufferSize: 10240,
 	}
 
 	WsConn *websocket.Conn
