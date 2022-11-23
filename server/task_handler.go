@@ -24,13 +24,13 @@ func (s *Server) HandleCreateTask() gin.HandlerFunc {
 			return
 		}
 		task.UserID = userId
-		userResponse, errr := s.TaskService.CreateTask(&task)
+		userResponse, errr := s.TaskService.PushToRabbitMq(&task)
 		if errr != nil {
 			log.Println(errr)
 			errr.Respond(c)
 			return
 		}
-		response.JSON(c, "Task Creation successful", http.StatusCreated, userResponse, nil)
+		response.JSON(c, "your request has been received and is being processed, you will receive a notification", http.StatusCreated, userResponse, nil)
 	}
 }
 
@@ -96,24 +96,19 @@ func (s *Server) handleDeleteTask() gin.HandlerFunc {
 func GetValuesFromContext(c *gin.Context) (string, *models.User, *errors.Error) {
 	var tokenI, userI interface{}
 	var tokenExists, userExists bool
-	log.Println("hello 1")
 	if tokenI, tokenExists = c.Get("access_token"); !tokenExists {
 		return "", nil, errors.New("forbidden", http.StatusForbidden)
 	}
-	log.Println("hello 2")
 	if userI, userExists = c.Get("user"); !userExists {
 		return "", nil, errors.New("forbidden", http.StatusForbidden)
 	}
-	log.Println("hello 3")
 	token, ok := tokenI.(string)
 	if !ok {
 		return "", nil, errors.New("internal server error", http.StatusInternalServerError)
 	}
-	log.Println("hello 4")
 	user, ok := userI.(*models.User)
 	if !ok {
 		return "", nil, errors.New("internal server error", http.StatusInternalServerError)
 	}
-	log.Println("hello 5")
 	return token, user, nil
 }

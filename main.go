@@ -30,5 +30,6 @@ func main() {
 		UserService:    userService,
 		TaskService:    taskService,
 	}
+	go taskService.Consumer()
 	s.Start()
 }
